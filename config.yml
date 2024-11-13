@@ -1,0 +1,12 @@
+lbInstanceId: LB01
+services:
+  - serviceName: dummy
+    servicePort: 443
+    pathPrefix: /dummy
+    serviceProtocol: HTTPS
+    healthCheckEndpoint: /health
+    connectionTimeoutMs: 1000
+    healthCheckIntervalMs: 1000
+    instances:
+      - serviceInstanceId: dummy01
+        host: https://httpbin.org/
