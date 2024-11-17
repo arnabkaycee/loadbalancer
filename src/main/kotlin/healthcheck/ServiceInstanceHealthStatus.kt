@@ -1,7 +1,12 @@
-package io.github.arnabkaycee.healthcheck
+@file:UseSerializers(InstantSerializer::class)
 
+package io.github.arnabkaycee.healthcheck
+import io.github.arnabkaycee.configuration.InstantSerializer
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.UseSerializers
 import java.time.Instant
 
+@Serializable
 data class ServiceInstanceHealthStatus(
     val lbInstanceId: String,
     val serviceName: String,

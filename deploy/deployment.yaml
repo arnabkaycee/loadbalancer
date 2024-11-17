@@ -1,0 +1,70 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: httpbin-alpha
+  labels:
+    app: httpbin-alpha
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: httpbin-alpha
+  template:
+    metadata:
+      labels:
+        app: httpbin-alpha
+    spec:
+      containers:
+        - name: httpbin
+          image: kennethreitz/httpbin
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: httpbin-alpha-svc
+spec:
+  selector:
+    app: httpbin-alpha
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: httpbin-beta
+  labels:
+    app: httpbin-beta
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: httpbin-beta
+  template:
+    metadata:
+      labels:
+        app: httpbin-beta
+    spec:
+      containers:
+        - name: httpbin
+          image: kennethreitz/httpbin
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: httpbin-beta-svc
+spec:
+  selector:
+    app: httpbin-beta
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: ClusterIP

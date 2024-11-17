@@ -2,6 +2,7 @@ package io.github.arnabkaycee.healthcheck
 
 import io.github.arnabkaycee.configuration.UpstreamService
 import kotlinx.coroutines.*
+import mu.KotlinLogging
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.time.Duration
@@ -14,6 +15,9 @@ class HealthCheckWorkerService(
     private val coroutineScope: CoroutineScope
 
 ) {
+    private companion object {
+        private val logger = KotlinLogging.logger {}
+    }
 
     private val client: OkHttpClient by lazy {
         val timeout = Duration.ofMillis(service.healthCheckTimeoutMs)
@@ -31,7 +35,8 @@ class HealthCheckWorkerService(
             .healthCheckUrls
             .map { (instanceId, healthCheckUrl) -> instanceId to Request.Builder().url(healthCheckUrl).build() }
             .forEach { (instanceId, healthCheckRequest) ->
-                coroutineScope.launch(Dispatchers.Default) {
+                coroutineScope.launch {
+                    logger.info { "Checking health for service ${service.serviceName}..." }
                     client.newCall(healthCheckRequest).execute().use { response ->
                         if (response.code == 200) {
                             healthCheckStatusRepository.saveStatus(
@@ -42,6 +47,7 @@ class HealthCheckWorkerService(
                                     lastAlive = Instant.now()
                                 )
                             )
+                            logger.info { "Service ${service.serviceName} is alive..." }
                         } else {
                             val lastHealthCheck = healthCheckStatusRepository.loadStatus(
                                 lbInstanceId,
@@ -56,6 +62,7 @@ class HealthCheckWorkerService(
                                     failuresSinceLastAlive = 1
                                 )
                             healthCheckStatusRepository.saveStatus(newStatus)
+                            logger.info { "Service ${service.serviceName} is dead..." }
                         }
                     }
                 }

@@ -15,7 +15,9 @@ data class UpstreamService(
     val healthCheckIntervalMs: Long,
     val connectionTimeoutMs: Long
 ) {
-    val healthCheckUrls get() = instances.map { it.serviceInstanceId to "$serviceProtocol://${it.host}:$healthCheckPort/$healthCheckEndpoint".lowercase() }
+    val healthCheckUrls get() = instances.map {
+        it.serviceInstanceId to "$serviceProtocol://${it.host}:${it.healthCheckPort}/$healthCheckEndpoint".lowercase()
+    }
     val endpointUrls get() = instances.map { "$serviceProtocol://${it.host}:$servicePort".lowercase() }
 
     fun addInstance(serviceInstance: ServiceInstance): UpstreamService {
